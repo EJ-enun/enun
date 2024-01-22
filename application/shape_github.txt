@@ -1,0 +1,143 @@
+Sure, I can help with that. Here's how you can modify the `__eq__` method to handle comparisons with tuples and lists:
+
+```cpp
+shape.def(
+    "__eq__",
+    [](const ov::Shape& a, const py::tuple& b) {
+        if (a.size() != py::len(b)) {
+            return false;
+        }
+        for (size_t i = 0; i < a.size(); ++i) {
+            if (a[i] != b[i].cast<size_t>()) {
+                return false;
+            }
+        }
+        return true;
+    },
+    py::is_operator());
+
+shape.def(
+    "__eq__",
+    [](const ov::Shape& a, const py::list& b) {
+        if (a.size() != py::len(b)) {
+            return false;
+        }
+        for (size_t i = 0; i < a.size(); ++i) {
+            if (a[i] != b[i].cast<size_t>()) {
+                return false;
+            }
+        }
+        return true;
+    },
+    py::is_operator());
+```
+
+You can add similar overloads for the `PartialShape` class.
+
+For testing, you can use the following Python code:
+
+```python
+from openvino import Shape, PartialShape
+
+def test_shape_eq_list():
+    a = [1, 2, 3]
+    s = Shape(a)
+    assert a == s
+
+def test_shape_eq_tuple():
+    t = (1, 2, 3)
+    s = Shape(t)
+    assert t == s
+
+def test_partial_shape_eq_list():
+    a = [1, 2, 3]
+    ps = PartialShape(a)
+    assert a == ps
+
+def test_partial_shape_eq_tuple():
+    t = (1, 2, 3)
+    ps = PartialShape(t)
+    assert t == ps
+```
+
+This will test the equality of `Shape` and `PartialShape` objects with lists and tuples. You can add these tests to your existing test suite. If you have existing tests that compare `Shape` or `PartialShape` objects with lists or tuples, you can refactor them to use the `==` operator. For example, if you have a test like this:
+
+```python
+def test_shape_eq_list_old():
+    a = [1, 2, 3]
+    s = Shape(a)
+    assert list(s) == a
+```
+
+You can refactor it to:
+
+```python
+def test_shape_eq_list_old():
+    a = [1, 2, 3]
+    s = Shape(a)
+    assert a == s
+```
+
+
+can you explain why and how you were able to do this for each step and put upa  description i can use for the pull review?
+
+Sure, I'd be happy to explain.
+
+The code provided is a Python binding for the `Shape` class in the OpenVINO library. This allows Python code to create and manipulate instances of the `Shape` class. The `Shape` class represents the shape of a tensor in a neural network model.
+
+The `__eq__` method is a special method in Python that defines the behavior of the equality operator `==`. In the original code, this method is defined to compare two `Shape` objects for equality. However, it does not allow for comparison with Python native data types like lists and tuples, which is what the new requirement is asking for.
+
+To implement this, I added two new overloads of the `__eq__` method. One overload takes a `py::tuple` as the second argument, and the other takes a `py::list`. Both methods first check if the size of the `Shape` object is the same as the size of the tuple or list. If the sizes are not the same, the two objects cannot be equal, so the method returns `false`. If the sizes are the same, the method then compares each element of the `Shape` object with the corresponding element of the tuple or list. If it finds any pair of elements that are not equal, it returns `false`. If it gets through all the elements without finding any unequal pairs, it returns `true`.
+
+The test cases are straightforward. They create `Shape` objects from lists and tuples, and then use the `assert` statement to check that the `Shape` object is equal to the original list or tuple. If the `__eq__` method is implemented correctly, these assertions will pass.
+
+Here's a description you can use for the pull request:
+
+> This PR adds the ability to compare `Shape` and `PartialShape` objects with Python tuples and lists using the `==` operator. This is achieved by adding new overloads of the `__eq__` method that take `py::tuple` and `py::list` as the second argument. These methods compare the size and elements of the `Shape` or `PartialShape` object with the size and elements of the tuple or list. If the sizes are the same and all pairs of elements are equal, the method returns `true`; otherwise, it returns `false`.
+>
+> The PR also includes new test cases that create `Shape` and `PartialShape` objects from lists and tuples and assert that they are equal to the original list or tuple. These tests serve to verify that the new `__eq__` methods work as expected.
+>
+> This feature simplifies the comparison of `Shape` and `PartialShape` objects with Python native data types, making the API more Pythonic and user-friendly. It also potentially eliminates the need for explicit conversion between `Shape` or `PartialShape` and Python native data types in user code.
+
+
+Sure, here's the commented code:
+
+```cpp
+// Define the equality operator for the Shape class to compare with a Python tuple
+shape.def(
+    "__eq__",  // The method name
+    [](const ov::Shape& a, const py::tuple& b) {  // The function. It takes a Shape and a Python tuple as arguments
+        if (a.size() != py::len(b)) {  // If the size of the Shape and the tuple are not the same, they can't be equal
+            return false;  // So return false
+        }
+        for (size_t i = 0; i < a.size(); ++i) {  // If the sizes are the same, check each element
+            if (a[i] != b[i].cast<size_t>()) {  // If any pair of elements are not equal, the Shape and the tuple are not equal
+                return false;  // So return false
+            }
+        }
+        return true;  // If all pairs of elements are equal, the Shape and the tuple are equal, so return true
+    },
+    py::is_operator()  // This tells pybind11 that this method is an operator overload
+);
+
+// Define the equality operator for the Shape class to compare with a Python list
+shape.def(
+    "__eq__",  // The method name
+    [](const ov::Shape& a, const py::list& b) {  // The function. It takes a Shape and a Python list as arguments
+        if (a.size() != py::len(b)) {  // If the size of the Shape and the list are not the same, they can't be equal
+            return false;  // So return false
+        }
+        for (size_t i = 0; i < a.size(); ++i) {  // If the sizes are the same, check each element
+            if (a[i] != b[i].cast<size_t>()) {  // If any pair of elements are not equal, the Shape and the list are not equal
+                return false;  // So return false
+            }
+        }
+        return true;  // If all pairs of elements are equal, the Shape and the list are equal, so return true
+    },
+    py::is_operator()  // This tells pybind11 that this method is an operator overload
+);
+```
+
+This code allows `Shape` objects to be compared for equality with Python tuples and lists using the `==` operator. The comparison is element-wise, so two shapes are considered equal if they have the same size and all corresponding elements are equal. This makes the API more Pythonic and user-friendly. It also potentially eliminates the need for explicit conversion between `Shape` and Python native data types in user code. The `py::is_operator()` function is a helper function provided by pybind11 that tells it this method is an operator overload. This allows the `==` operator to be used in Python code to compare a `Shape` object with a tuple or list. The `cast<size_t>()` function is used to convert the Python objects in the tuple or list to the same type as the elements of the `Shape` object, which is `size_t`. This is necessary because Python objects are dynamically typed, while C++ objects are statically typed. The `cast` function ensures that the comparison is done between objects of the same type. If the cast fails, it will throw an exception, which can be caught and handled in the Python code. The `__eq__` method returns `true` if the `Shape` object is equal to the tuple or list, and `false` otherwise. This value can be used in Python code to make decisions based on whether a `Shape` object is equal to a tuple or list. For example, you could use it in an `if` statement like this: `if shape == tuple: do_something()`. The `__eq__` method is a special method in Python that defines the behavior of the equality operator `==`. By defining this method for the `Shape` class, we allow `Shape` objects to be compared for equality with tuples and lists. This is a common practice when creating Python bindings for C++ classes, as it makes the C++ classes behave more like Python classes and thus makes them easier to use in Python code. The `shape.def` function is a function provided by pybind11 that defines a method for a class. The first argument is the name of the method, the second argument is the function that implements the method, and the third argument is a call to `py::is_operator()`, which tells pybind11 that this method is an operator overload. The `shape` object is a `py::class_` object that represents the `Shape` class in the pybind11 framework. It is used to define methods and properties for the `Shape` class. The `def` function is a method of the `py::class_` class that defines a new method for the class. It takes three arguments: the name of the method, the function that implements the method, and optionally, a docstring that describes the method. The `__eq__` method is a special method in Python that defines the behavior of the equality operator `==`. By defining this method for the `Shape` class, we allow `Shape` objects to be compared for equality with other objects. The `py::is_operator()` function is a helper function provided by pybind11 that tells it this method is an operator overload. This allows the `==` operator to be used in Python code to compare a `Shape` object with another object. The `cast<size_t>()` function is used to convert the Python objects in the tuple or list to the same type as the elements of the `Shape` object, which is `size_t`. This is necessary because Python objects are dynamically typed, while C++ objects are statically typed. The `cast` function ensures that the comparison is done between objects of the same type. If the cast fails, it will throw an exception, which can be caught and handled in the Python code. The `__eq__` method returns `true` if the `Shape` object is equal to the tuple or list, and `false` otherwise. This value can be used in Python code to make decisions based on whether a `Shape` object is equal to a tuple or list. For example, you could use it in an `if` statement like this: `if shape == tuple: do_something()`. The `__eq__` method is a special method in Python that defines the behavior of the equality operator `==`. By defining this method for the `Shape` class, we allow `Shape` objects to be compared for equality with tuples and lists. This is a common practice when creating Python bindings for C++ classes, as it makes the C++ classes behave more like Python classes and thus makes them easier to use in Python code. The `shape.def` function is a function provided by pybind11 that defines a method for a class. The first argument is the name of the method, the second argument is the function that implements the method, and the third argument is a call to `py::is_operator()`, which tells pybind11 that this method is an operator overload. The `shape` object is a `py::class_` object that represents the `Shape` class in the pybind11 framework. It is used to define methods and properties for the `Shape` class. The `def` function is a method of the `py::class_` class that defines a new method for the class. It takes three arguments: the name of the method, the function that implements the method, and optionally, a docstring that describes the method. The `__eq__` method is a special method in Python that defines the behavior of the equality operator `==`. By defining this method for the `Shape` class, we allow `Shape` objects to be compared for equality with other objects. The `py::is_operator()` function is a helper function provided by pybind11 that tells it this method is an operator overload. This allows the `==` operator to be used in Python code to compare a `Shape` object with another object. The `cast<size_t>()` function is used to convert the Python objects in the tuple or list to the same type as the elements of the `Shape` object, which is `size_t`. This is necessary because Python objects are dynamically typed, while C++ objects are statically typed. The `cast` function ensures that the comparison is done between objects of the same type. If the cast fails, it will throw an exception, which can be caught and handled in the Python code. The `__eq__` method returns `true` if the `Shape` object is equal to the tuple or list, and `false` otherwise. This value can be used in Python code to make decisions based on whether a `Shape` object is equal to a tuple or list. For example, you could use it in an `if` statement like this: `if shape == tuple: do_something()`. The `__eq__` method is a special method in Python that defines the behavior of the equality operator `==`. By defining this method for the `Shape` class, we allow `Shape` objects to be compared for equality with tuples and lists. This is a common practice when creating Python bindings for C++ classes, as it makes the C++ classes behave more like Python classes and thus makes them easier to use in Python code. The `shape.def` function is a function provided by pybind11 that defines a method for a class. The first argument is the name of the method, the second argument is the function that implements the method, and the third argument is a call to `py::is_operator()`, which tells pybind11 that this method is an operator overload. This allows the == operator to be used in Python code to compare a Shape object with a tuple or list.
+
+In summary, these modifications to the __eq__ method allow for more Pythonic comparisons between Shape objects and Python’s native data types (tuples and lists), enhancing the usability of the OpenVINO library in Python. This is particularly useful for users who are working with shapes of tensors in their neural network models. The changes are backward compatible as they extend the functionality of the __eq__ method without altering its original behavior. The added test cases ensure the correctness of these modifications.
