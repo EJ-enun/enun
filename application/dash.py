@@ -7,6 +7,9 @@ app = dash.Dash(__name__,
                 meta_tags=[
                     {'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0, maximum-scale=1.2, minimum-scale=0.5,'}],
                 external_stylesheets=[dbc.themes.QUARTZ])
+ 
+#Setup Style Sheets file.  
+#app.css.append_css({"external_url": "/application/static/style.css"})
 
 server = app.server
 #App Title.
@@ -32,7 +35,7 @@ navbar = dbc.NavbarSimple(
     color="primary",
     dark=True,
 )
-app.layout = dbc.Container(fluid=True, children=[navbar])
+app.layout = dbc.Container(children=[navbar],style={ "height" : "100vh",'width': "100vh"})
 
 @app.callback(
     [Output('some_stuff', 'children'),],
