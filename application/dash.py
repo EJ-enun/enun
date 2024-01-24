@@ -13,25 +13,48 @@ app = dash.Dash(__name__,
 
 server = app.server
 #App Title.
-app.title = 'ENUN BASSEY'
+app.title = 'Monumentos Madrid'
 # Navbar
 
-navbar = dbc.NavbarSimple(
-    children=[
-        dbc.NavItem(dbc.NavLink("Viva Madrid", href="#")),
-        dbc.DropdownMenu(
-            children=[
-                dbc.DropdownMenuItem("More", header=True),
-                dbc.DropdownMenuItem("Events", href="#"),
-                dbc.DropdownMenuItem("Contact Us, href="#"),
-            ],
-            nav=True,
-            in_navbar=True,
-            label="More",
-        ),
-    ],
-    brand="Comunidad Dee Madrid",
-    brand_href="#",
+navbar = dbc.Navbar(
+    dbc.Container(
+        [
+            html.A(
+                # Use row and col to control vertical alignment of logo / brand
+                dbc.Row(
+                    [
+                        dbc.Col(html.Img(src="/assets/cmadrid.jpg", height="30px")),
+                        dbc.Col(dbc.NavbarBrand("Comunidad De Madrid", className="ml-2")),
+                    ],
+                    align="center",
+                    no_gutters=True,
+                ),
+                href="#",
+            ),
+            dbc.NavbarToggler(id="navbar-toggler"),
+            dbc.Collapse(
+                dbc.Nav(
+                    [
+                        dbc.NavItem(dbc.NavLink("Viva Madrid", href="#")),
+                        dbc.DropdownMenu(
+                            children=[
+                                dbc.DropdownMenuItem("More", header=True),
+                                dbc.DropdownMenuItem("Events", href="#"),
+                                dbc.DropdownMenuItem("Contact Us", href="#"),
+                            ],
+                            nav=True,
+                            in_navbar=True,
+                            label="More",
+                        ),
+                    ], 
+                    className="ml-auto", # Aligns navbar items to the right
+                    navbar=True
+                ),
+                id="navbar-collapse",
+                navbar=True,
+            ),
+        ]
+    ),
     color="FF0000",
     dark=True,
 )
