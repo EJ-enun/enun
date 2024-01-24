@@ -15,7 +15,7 @@ server = app.server
 #App Title.
 app.title = 'Monumentos Madrid'
 # Navbar
-
+app._favicon = ("assets/favicon.ico")
 navbar = dbc.Navbar(
     dbc.Container(
         [
@@ -55,7 +55,7 @@ navbar = dbc.Navbar(
             ),
         ]
     ),
-    color="FF0000",
+    color="Primary",
     dark=True,
 )
 
