@@ -27,7 +27,7 @@ navbar = dbc.Navbar(
                         dbc.Col(dbc.NavbarBrand("Comunidad De Madrid", className="ml-2")),
                     ],
                     align="center",
-                    no_gutters=True,
+                    
                 ),
                 href="#",
             ),
