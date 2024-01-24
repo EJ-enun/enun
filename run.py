@@ -7,4 +7,4 @@ from settings import config
 
 
 
-app.run_server()
+app.run_server(debug=config.debug, host=config.host, port=6867)
