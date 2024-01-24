@@ -18,25 +18,52 @@ app.title = 'ENUN BASSEY'
 
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink("Page 1", href="#")),
+        dbc.NavItem(dbc.NavLink("Viva Madrid", href="#")),
         dbc.DropdownMenu(
             children=[
-                dbc.DropdownMenuItem("More pages", header=True),
-                dbc.DropdownMenuItem("Page 2", href="#"),
-                dbc.DropdownMenuItem("Page 3", href="#"),
+                dbc.DropdownMenuItem("More", header=True),
+                dbc.DropdownMenuItem("Events", href="#"),
+                dbc.DropdownMenuItem("Contact Us, href="#"),
             ],
             nav=True,
             in_navbar=True,
             label="More",
         ),
     ],
-    brand="NavbarSimple",
+    brand="Comunidad Dee Madrid",
     brand_href="#",
-    color="primary",
+    color="FF0000",
     dark=True,
 )
-app.layout = dbc.Container(children=[navbar],style={ "height" : "100vh",'width': "100vh"})
 
+location = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
+])
+app.layout = dbc.Container(fluid=True, children=[navbar, location])
+
+
+# Define the layout for the homepage
+home_layout = html.Div([
+    html.H1('Welcome to the History of Madrid App!'),
+    dcc.Link('Go to Madrid History', href='/madrid-history'),
+])
+
+# Define the layout for the Madrid History page
+madrid_layout = html.Div([
+    html.H1('History of Madrid'),
+    html.P('The documented history of Madrid dates to the 9th century, even though the area has been inhabited since the Stone Age. The primitive nucleus of Madrid, a walled military outpost in the left bank of the Manzanares, dates back to the second half of the 9th century, during the rule of the Emirate of Córdoba[^1^][5].'),
+    dcc.Link('Go back to home', href='/'),
+])
+
+# Update the index page
+@app.callback(Output('page-content', 'children'),
+              [Input('url', 'pathname')])
+def display_page(pathname):
+    if pathname == '/madrid-history':
+        return madrid_layout
+    else:
+        return home_layout
 @app.callback(
     [Output('some_stuff', 'children'),],
     [Input('stuff', 'value')])
